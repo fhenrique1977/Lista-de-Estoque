@@ -56,3 +56,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+const generatePdfButton = document.getElementById('generate-pdf');
+
+    if (generatePdfButton) {
+        generatePdfButton.addEventListener('click', () => {
+            // Cria um novo documento jsPDF
+            const doc = new window.jspdf.jsPDF();
+
+            // Prepara os dados para a tabela
+            const tableData = stockList.map(item => [item.item, item.quantity]);
+            const tableHeaders = [['Item', 'Quantidade']];
+
+            // Adiciona a tabela ao PDF
+            doc.autoTable({
+                head: tableHeaders,
+                body: tableData,
+                startY: 10, // Posição inicial da tabela
+                headStyles: { fillColor: [200, 200, 200] }, // Estilo do cabeçalho
+                altRowStyles: { fillColor: [245, 245, 245] }, // Estilo das linhas alternadas
+                margin: { top: 10 }
+            });
+
+            // Salva o PDF
+            doc.save('lista_de_estoque.pdf');
+        });
+    }
