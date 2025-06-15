@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemInput = document.getElementById('item-input');
     const addButton = document.getElementById('add-button');
     const stockTableBody = document.querySelector('#stock-table tbody');
-    let stockList = [];
     function addItem() {
         var _a;
         const itemName = (_a = itemInput === null || itemInput === void 0 ? void 0 : itemInput.value) === null || _a === void 0 ? void 0 : _a.trim();
