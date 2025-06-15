@@ -61,4 +61,31 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Função para gerar PDF da tabela de estoque
+    const generatePdfButton = document.getElementById('generate-pdf');
+    if (generatePdfButton) {
+        generatePdfButton.addEventListener('click', () => {
+            // @ts-ignore
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Monta os dados da tabela
+            const tableData = stockList.map((itemObj: { item: string; quantity: number }) => [
+                itemObj.item,
+                itemObj.quantity.toString()
+            ]);
+
+            // Cabeçalhos
+            const headers = [['Item', 'Quantidade']];
+
+            // @ts-ignore
+            doc.autoTable({
+                head: headers,
+                body: tableData,
+            });
+
+            doc.save('estoque.pdf');
+        });
+    }
 });
