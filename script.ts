@@ -1,9 +1,10 @@
+let stockList: Array<{ item: string; quantity: number }>;
 document.addEventListener('DOMContentLoaded', () => {
     const itemInput = document.getElementById('item-input');
     const addButton = document.getElementById('add-button');
     const stockTableBody = document.querySelector('#stock-table tbody');
+stockList = [];
 
-    let stockList: Array<{ item: string; quantity: number }> = [];
 
     function addItem() {
         const itemName = (itemInput as HTMLInputElement)?.value?.trim();
