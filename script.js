@@ -60,36 +60,45 @@ document.addEventListener('DOMContentLoaded', function () {
         generatePdfButton.addEventListener('click', function () {
             // @ts-ignore
             var doc = new window.jspdf.jsPDF();
-            // Monta os dados da tabela
+            doc.text('Relatório de Estoque', 14, 15);
             var tableData = stockList.map(function (itemObj) { return [
                 itemObj.item,
                 itemObj.quantity.toString()
             ]; });
-            // Cabeçalhos
             var headers = [['Item', 'Quantidade']];
             // @ts-ignore
             doc.autoTable({
                 head: headers,
                 body: tableData,
-                theme: 'plain', // Usar tema 'plain' para remover estilos padrão
+                startY: 20,
+                theme: 'plain',
                 styles: {
-                    textColor: 0, // Preto para o texto
-                    lineColor: 0, // Preto para as linhas da borda
-                    lineWidth: 0.1 // Espessura da linha da borda
+                    textColor: 0,
+                    lineColor: 0,
+                    lineWidth: 0.1
                 },
                 headStyles: {
-                    fillColor: 255, // Branco para o fundo do cabeçalho
-                    textColor: 0, // Preto para o texto do cabeçalho
-                    fontStyle: 'bold' // Texto do cabeçalho em negrito
+                    fillColor: 255,
+                    textColor: 0,
+                    fontStyle: 'bold'
                 },
                 bodyStyles: {
-                    fillColor: 255, // Branco para o fundo do corpo
-                    textColor: 0 // Preto para o texto do corpo
+                    fillColor: 255,
+                    textColor: 0
                 },
-                didDrawPage: function (data) {
-                    // Adicionar borda externa à tabela
-                    doc.setDrawColor(0); // Cor da borda preta
-                    doc.rect(data.settings.margin.left, data.startY, data.table.width, data.table.height);
+                didDrawTable: function (data) {
+                    doc.setDrawColor(0);
+                    var x = data.table.position.x;
+                    var y = data.table.position.y;
+                    var width = data.table.width;
+                    var height = data.table.height;
+                    if (typeof x === 'number' && typeof y === 'number' && typeof width === 'number' && typeof height === 'number' &&
+                        !isNaN(x) && !isNaN(y) && !isNaN(width) && !isNaN(height)) {
+                        doc.rect(x, y, width, height);
+                    }
+                    else {
+                        console.warn("Argumentos inv\u00E1lidos para doc.rect: x=".concat(x, ", y=").concat(y, ", width=").concat(width, ", height=").concat(height));
+                    }
                 }
             });
             doc.save('estoque.pdf');

@@ -1,10 +1,8 @@
-let stockList: Array<{ item: string; quantity: number }>;
 document.addEventListener('DOMContentLoaded', () => {
     const itemInput = document.getElementById('item-input');
     const addButton = document.getElementById('add-button');
     const stockTableBody = document.querySelector('#stock-table tbody');
-stockList = [];
-
+    let stockList: Array<{ item: string; quantity: number }> = [];
 
     function addItem() {
         const itemName = (itemInput as HTMLInputElement)?.value?.trim();
@@ -25,6 +23,7 @@ stockList = [];
         stockTableBody.innerHTML = '';
         stockList.forEach((itemObj, index) => {
             const row = document.createElement('tr');
+
             const itemCell = document.createElement('td');
             itemCell.textContent = itemObj.item;
             row.appendChild(itemCell);
@@ -63,46 +62,60 @@ stockList = [];
         });
     }
 
-    // Função para gerar PDF da tabela de estoque
+    // Função para gerar PDF
     const generatePdfButton = document.getElementById('generate-pdf');
     if (generatePdfButton) {
         generatePdfButton.addEventListener('click', () => {
             // @ts-ignore
             const doc = new window.jspdf.jsPDF();
 
-            // Monta os dados da tabela
-            const tableData = stockList.map((itemObj: { item: string; quantity: number }) => [
+            doc.text('Relatório de Estoque', 14, 15);
+
+            const tableData = stockList.map(itemObj => [
                 itemObj.item,
                 itemObj.quantity.toString()
             ]);
 
-            // Cabeçalhos
             const headers = [['Item', 'Quantidade']];
 
             // @ts-ignore
             doc.autoTable({
                 head: headers,
                 body: tableData,
-                theme: 'plain', // Usar tema 'plain' para remover estilos padrão
-                styles: { // Estilos gerais da tabela
-                    textColor: 0, // Preto para o texto
-                    lineColor: 0, // Preto para as linhas da borda
-                    lineWidth: 0.1 // Espessura da linha da borda
+                startY: 20,
+                theme: 'plain',
+                styles: {
+                    textColor: 0,
+                    lineColor: 0,
+                    lineWidth: 0.1
                 },
-                headStyles: { // Estilos do cabeçalho
-                    fillColor: 255, // Branco para o fundo do cabeçalho
-                    textColor: 0, // Preto para o texto do cabeçalho
-                    fontStyle: 'bold' // Texto do cabeçalho em negrito
+                headStyles: {
+                    fillColor: 255,
+                    textColor: 0,
+                    fontStyle: 'bold'
                 },
-                bodyStyles: { // Estilos do corpo da tabela
-                    fillColor: 255, // Branco para o fundo do corpo
-                    textColor: 0 // Preto para o texto do corpo
+                bodyStyles: {
+                    fillColor: 255,
+                    textColor: 0
                 },
-                didDrawPage: function (data: any) { // Usar 'any' temporariamente se HookData não for reconhecido
-                    // Adicionar borda externa à tabela
-                    doc.setDrawColor(0); // Cor da borda preta
-console.log('Rect arguments:', data.settings.margin.left, data.startY, data.table.width, data.table.height);
-                    doc.rect(data.settings.margin.left, data.startY, data.table.width, data.table.height);
+                didDrawTable: function (data: any) {
+                    doc.setDrawColor(0);
+                    const x = data.table.position.x;
+                    const y = data.table.position.y;
+                    const width = data.table.width;
+                    const height = data.table.height;
+
+                    if (
+                        typeof x === 'number' &&
+                        typeof y === 'number' &&
+                        typeof width === 'number' &&
+                        typeof height === 'number' &&
+                        !isNaN(x) && !isNaN(y) && !isNaN(width) && !isNaN(height)
+                    ) {
+                        doc.rect(x, y, width, height);
+                    } else {
+                        console.warn(`Argumentos inválidos para doc.rect: x=${x}, y=${y}, width=${width}, height=${height}`);
+                    }
                 }
             });
 
