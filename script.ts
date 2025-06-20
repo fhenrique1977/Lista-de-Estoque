@@ -101,6 +101,7 @@ stockList = [];
                 didDrawPage: function (data: any) { // Usar 'any' temporariamente se HookData não for reconhecido
                     // Adicionar borda externa à tabela
                     doc.setDrawColor(0); // Cor da borda preta
+console.log('Rect arguments:', data.settings.margin.left, data.startY, data.table.width, data.table.height);
                     doc.rect(data.settings.margin.left, data.startY, data.table.width, data.table.height);
                 }
             });
