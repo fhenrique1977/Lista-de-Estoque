@@ -67,8 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (generatePdfButton) {
         generatePdfButton.addEventListener('click', () => {
             // @ts-ignore
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+            const doc = new window.jspdf.jsPDF();
 
             // Monta os dados da tabela
             const tableData = stockList.map((itemObj: { item: string; quantity: number }) => [
@@ -83,6 +82,26 @@ document.addEventListener('DOMContentLoaded', () => {
             doc.autoTable({
                 head: headers,
                 body: tableData,
+                theme: 'plain', // Usar tema 'plain' para remover estilos padrão
+                styles: { // Estilos gerais da tabela
+                    textColor: 0, // Preto para o texto
+                    lineColor: 0, // Preto para as linhas da borda
+                    lineWidth: 0.1 // Espessura da linha da borda
+                },
+                headStyles: { // Estilos do cabeçalho
+                    fillColor: 255, // Branco para o fundo do cabeçalho
+                    textColor: 0, // Preto para o texto do cabeçalho
+                    fontStyle: 'bold' // Texto do cabeçalho em negrito
+                },
+                bodyStyles: { // Estilos do corpo da tabela
+                    fillColor: 255, // Branco para o fundo do corpo
+                    textColor: 0 // Preto para o texto do corpo
+                },
+                didDrawPage: function (data: any) { // Usar 'any' temporariamente se HookData não for reconhecido
+                    // Adicionar borda externa à tabela
+                    doc.setDrawColor(0); // Cor da borda preta
+                    doc.rect(data.settings.margin.left, data.startY, data.table.width, data.table.height);
+                }
             });
 
             doc.save('estoque.pdf');

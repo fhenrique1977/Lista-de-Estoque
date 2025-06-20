@@ -1,11 +1,11 @@
-"use strict";
-document.addEventListener('DOMContentLoaded', () => {
-    const itemInput = document.getElementById('item-input');
-    const addButton = document.getElementById('add-button');
-    const stockTableBody = document.querySelector('#stock-table tbody');
+document.addEventListener('DOMContentLoaded', function () {
+    var itemInput = document.getElementById('item-input');
+    var addButton = document.getElementById('add-button');
+    var stockTableBody = document.querySelector('#stock-table tbody');
+    var stockList = [];
     function addItem() {
         var _a;
-        const itemName = (_a = itemInput === null || itemInput === void 0 ? void 0 : itemInput.value) === null || _a === void 0 ? void 0 : _a.trim();
+        var itemName = (_a = itemInput === null || itemInput === void 0 ? void 0 : itemInput.value) === null || _a === void 0 ? void 0 : _a.trim();
         if (itemName !== '' && itemInput) {
             stockList.push({ item: itemName, quantity: 1 });
             updateTable();
@@ -20,25 +20,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!stockTableBody)
             return;
         stockTableBody.innerHTML = '';
-        stockList.forEach((itemObj, index) => {
-            const row = document.createElement('tr');
-            const itemCell = document.createElement('td');
+        stockList.forEach(function (itemObj, index) {
+            var row = document.createElement('tr');
+            var itemCell = document.createElement('td');
             itemCell.textContent = itemObj.item;
             row.appendChild(itemCell);
-            const quantityCell = document.createElement('td');
-            const quantityInput = document.createElement('input');
+            var quantityCell = document.createElement('td');
+            var quantityInput = document.createElement('input');
             quantityInput.type = 'number';
             quantityInput.value = itemObj.quantity.toString();
             quantityInput.min = '1';
-            quantityInput.addEventListener('change', () => {
+            quantityInput.addEventListener('change', function () {
                 itemObj.quantity = Number(quantityInput.value);
             });
             quantityCell.appendChild(quantityInput);
             row.appendChild(quantityCell);
-            const actionsCell = document.createElement('td');
-            const removeButton = document.createElement('button');
+            var actionsCell = document.createElement('td');
+            var removeButton = document.createElement('button');
             removeButton.textContent = 'Remover';
-            removeButton.addEventListener('click', () => removeItem(index));
+            removeButton.addEventListener('click', function () { return removeItem(index); });
             actionsCell.appendChild(removeButton);
             row.appendChild(actionsCell);
             stockTableBody.appendChild(row);
@@ -54,30 +54,45 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
-
-const generatePdfButton = document.getElementById('generate-pdf');
-
+    // Função para gerar PDF da tabela de estoque
+    var generatePdfButton = document.getElementById('generate-pdf');
     if (generatePdfButton) {
-        generatePdfButton.addEventListener('click', () => {
-            // Cria um novo documento jsPDF
-            const doc = new window.jspdf.jsPDF();
-
-            // Prepara os dados para a tabela
-            const tableData = stockList.map(item => [item.item, item.quantity]);
-            const tableHeaders = [['Item', 'Quantidade']];
-
-            // Adiciona a tabela ao PDF
+        generatePdfButton.addEventListener('click', function () {
+            // @ts-ignore
+            var doc = new window.jspdf.jsPDF();
+            // Monta os dados da tabela
+            var tableData = stockList.map(function (itemObj) { return [
+                itemObj.item,
+                itemObj.quantity.toString()
+            ]; });
+            // Cabeçalhos
+            var headers = [['Item', 'Quantidade']];
+            // @ts-ignore
             doc.autoTable({
-                head: tableHeaders,
+                head: headers,
                 body: tableData,
-                startY: 10, // Posição inicial da tabela
-                headStyles: { fillColor: [200, 200, 200] }, // Estilo do cabeçalho
-                altRowStyles: { fillColor: [245, 245, 245] }, // Estilo das linhas alternadas
-                margin: { top: 10 }
+                theme: 'plain', // Usar tema 'plain' para remover estilos padrão
+                styles: {
+                    textColor: 0, // Preto para o texto
+                    lineColor: 0, // Preto para as linhas da borda
+                    lineWidth: 0.1 // Espessura da linha da borda
+                },
+                headStyles: {
+                    fillColor: 255, // Branco para o fundo do cabeçalho
+                    textColor: 0, // Preto para o texto do cabeçalho
+                    fontStyle: 'bold' // Texto do cabeçalho em negrito
+                },
+                bodyStyles: {
+                    fillColor: 255, // Branco para o fundo do corpo
+                    textColor: 0 // Preto para o texto do corpo
+                },
+                didDrawPage: function (data) {
+                    // Adicionar borda externa à tabela
+                    doc.setDrawColor(0); // Cor da borda preta
+                    doc.rect(data.settings.margin.left, data.startY, data.table.width, data.table.height);
+                }
             });
-
-            // Salva o PDF
-            doc.save('lista_de_estoque.pdf');
+            doc.save('estoque.pdf');
         });
     }
+});
